@@ -1,0 +1,293 @@
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+            <!-- TOP Nav Bar END -->
+            <div class="container-fluid">
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="iq-card">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title"><%= web.judul %></h4>
+                           </div>
+                        </div>
+                        
+                        <div class="iq-card-body">
+                           <div class="iq-card">
+                              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTambahAgama">Create New</button> 
+                           </div>
+
+                           <div class="table-responsive">
+                             
+                              <table id="datatable" class="table table-striped  table-light  table-bordered" >
+                                 <thead>
+                                   
+                                    <tr>
+                                       <th width="50px">No</th>
+                                       <th>Agama</th>
+                                       <th>Aktif</th>
+                                       <th width="150px">Pilih</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <% x=1 %>
+                                    <% data.forEach(function(agama) { %>
+                                       <tr>
+                                          <td><%= x++ %></th>
+                                             <td><%= agama.nama_agama %></td>
+                                             <td><%= agama.aktif %></td>
+                                         <td>
+                                          <button class="btn btn-sm btn-success" data-id="<%= agama.id_agama %>" data-nama="<%= agama.nama_agama %>" data-aktif="<%= agama.aktif %>" data-revisi="<%= agama.revisi+1 %>" data-update="<%= agama.updated_user %>" onclick="edit(this)">Edit</button>
+                                          <button class="btn btn-sm btn-danger" data-id="<%= agama.id_agama %>" onclick="remove(this)">Remove</button>
+                                       </td>
+                                       </tr>
+                                     <% }); %>
+
+                                    
+                                 </tbody>
+                                 <tfoot>
+                                    <tr>
+                                       <th>No</th>
+                                       <th>Agama</th>
+                                       <th>Aktif</th>
+                                       <th>Pilih</th>
+                                    </tr>
+                                 </tfoot>
+                              </table>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+            <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>   
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.js"></script>
+
+<script>
+   $('#datatable').DataTable();
+
+   function remove(val){
+      const id = val.dataset.id;
+      fetch(`http://localhost:3000/master/agama/${id}/remove`, {
+         method: 'get'
+       })
+       .then(response => {
+
+         console.log(response)
+         if (response.ok) {
+           // Permintaan berhasil
+           Swal.fire({
+             icon: 'success',
+             title: 'Data agama berhasil dihapus',
+             showConfirmButton: false,
+             timer: 2500
+           }).then(() => {
+             // Alihkan ke halaman lain setelah SweetAlert ditutup
+             window.location.href = '<%= base_url %>/master/agama';
+           });
+         } else {
+           // Permintaan gagal
+           Swal.fire({
+             icon: 'error',
+             title: 'Oops...',
+             text: 'Terjadi kesalahan saat menghapus data agama!'
+           });
+           // Tampilkan pesan error atau lakukan tindakan yang sesuai
+         }
+       })
+       .catch(error => {
+         console.error(error);
+         Swal.fire({
+           icon: 'error',
+           title: 'Oops...',
+           text: 'Terjadi kesalahan saat menghapus data agama!'
+         });
+         // Tampilkan pesan error atau lakukan tindakan yang sesuai
+       });
+   }
+</script>
+ 
+ <!-- Modal Tambah-->
+ <div class="modal fade" id="modalTambahAgama" tabindex="-1" role="dialog" aria-labelledby="modalTambahAgamaLabel" aria-hidden="true">
+   <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="modalTambahAgamaLabel">Tambah Agama</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         <form id="formAgama">
+           <div class="form-group">
+             <label for="namaAgama">Nama Agama:</label>
+             <input type="text" class="form-control" id="namaAgama" name="nama_agama" required>
+           </div>
+           <div class="form-group">
+             <label for="createdUser">Created User:</label>
+             <input type="text" class="form-control" id="createdUser" name="created_user" required>
+           </div>
+           <div class="form-check">
+             <input type="checkbox" class="form-check-input" id="aktif" name="aktif" checked>
+             <label class="form-check-label" for="aktif">Aktif</label>
+           </div>
+         </form>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+         <button type="button" class="btn btn-primary" onclick="tambahAgama()">Tambah</button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <!-- Modal Edit -->
+<div class="modal fade" id="modalEditAgama" tabindex="-1" aria-labelledby="modalEditAgamaLabel" aria-hidden="true">
+   <div class="modal-dialog"  role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="modalEditAgamaLabel">Edit Agama</h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+       </div>
+       <div class="modal-body">
+         <form id="formEditAgama">
+           <div class="mb-3">
+             <label for="editNamaAgama" class="form-label">Nama Agama</label>
+             <input type="text" class="form-control" id="editNamaAgama" name="editNamaAgama">
+           </div>
+           <div class="form-group">
+            <label for="createdUser">Updated User:</label>
+            <input type="text" class="form-control" id="editUpdatedUser" name="editUpdatedUser" required>
+          </div>
+          <div class="form-group">
+           <label for="Revisi">Revisi:</label>
+           <input type="text" class="form-control" id="editRevisi" name="editRevisi" required>
+         </div>
+         <div class="form-check">
+           <input type="checkbox" class="form-check-input" id="editAktif" name="editAktif" >
+           <label class="form-check-label" for="aktif">Aktif</label>
+         </div>
+         <div class="form-check">
+           <input type="hidden" class="form-check-input" id="editIdAgama" name="editIdAgama" >
+         </div>
+         
+           <!-- tambahkan field lain yang diperlukan -->
+         </form>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+         <button type="button" class="btn btn-primary" onclick="simpanEditAgama()">Simpan</button>
+       </div>
+     </div>
+   </div>
+ </div>
+ 
+ <script>
+ function tambahAgama() {
+   const form = document.getElementById('formAgama');
+   const formData = new FormData(form);
+ 
+   fetch(`http://localhost:3000/master/agama/create`, {
+     method: 'POST',
+     body: formData
+   })
+   .then(response => {
+      
+     if (response.ok) {
+       // Permintaan berhasil
+       $('#modalTambahAgama').modal('hide'); // Menutup modal setelah sukses
+       Swal.fire({
+         icon: 'success',
+         title: 'Data agama berhasil ditambahkan',
+         showConfirmButton: false,
+         timer: 1500
+       }).then(() => {
+         window.location.href = '<%= base_url %>/master/agama';
+         //window.location.reload(); // Memuat ulang halaman setelah sukses
+       });
+     } else {
+       // Permintaan gagal
+       Swal.fire({
+         icon: 'error',
+         title: 'Oops...',
+         text: 'Terjadi kesalahan saat menambahkan data agama!'
+       });
+     }
+   })
+   .catch(error => {
+     console.error(error);
+     Swal.fire({
+       icon: 'error',
+       title: 'Oops...',
+       text: 'Terjadi kesalahan saat menambahkan data agama!'
+     });
+   });
+ }
+ 
+ function edit(button) {
+   // Mendapatkan data agama dari atribut data pada tombol
+   var idAgama = button.getAttribute('data-id');
+   var namaAgama = button.getAttribute('data-nama');
+   var aktif = button.getAttribute('data-aktif');
+   var revisi = button.getAttribute('data-revisi');
+   var updatedUser = button.getAttribute('data-update');
+
+   console.log(aktif)
+   // Mengisi nilai ke dalam form edit pada modal
+   document.getElementById('editIdAgama').value = idAgama;
+   document.getElementById('editNamaAgama').value = namaAgama;
+   document.getElementById('editUpdatedUser').value = updatedUser;
+   document.getElementById('editRevisi').value = revisi;
+   document.getElementById('editAktif').checked = (aktif === 'true');
+   
+   // Menampilkan modal
+   $('#modalEditAgama').modal('show');
+ }
+
+ function simpanEditAgama() {
+   const form = document.getElementById('formEditAgama');
+   const formData = new FormData(form);
+ 
+   fetch(`http://localhost:3000/master/agama/update`, {
+     method: 'POST',
+     body: formData
+   })
+   .then(response => {
+      
+     if (response.ok) {
+       // Permintaan berhasil
+       $('#modalEditAgama').modal('hide'); // Menutup modal setelah sukses
+       Swal.fire({
+         icon: 'success',
+         title: 'Data agama berhasil diubah',
+         showConfirmButton: false,
+         timer: 1500
+       }).then(() => {
+         window.location.href = '<%= base_url %>/master/agama';
+         //window.location.reload(); // Memuat ulang halaman setelah sukses
+       });
+     } else {
+       // Permintaan gagal
+       Swal.fire({
+         icon: 'error',
+         title: 'Oops...',
+         text: 'Terjadi kesalahan saat menambahkan data agama!'
+       });
+     }
+   })
+   .catch(error => {
+     console.error(error);
+     Swal.fire({
+       icon: 'error',
+       title: 'Oops...',
+       text: 'Terjadi kesalahan saat menambahkan data agama!'
+     });
+   });
+ }
+ 
+</script>
+ 
