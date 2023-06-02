@@ -43,13 +43,13 @@ async function agamaUpdate(id,namaAgama, updateBy, aktif, revisi) {
     try {
       const apiUrl = `http://localhost:3100/master-data/agama/${id}`;
       const response = await axios.put(apiUrl, {
-            akti: aktif,
+            aktif: aktif,
             revisi: revisi,
             nama_agama: namaAgama,
             updated_user: updateBy
           
       });
-      //console.log(response)
+     // console.log(response)
       return true; // Menyampaikan data ke view.ejs
     } catch (error) {
       console.error(error);

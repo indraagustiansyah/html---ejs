@@ -22,6 +22,13 @@ router.get("/", async (req, res) => {
   res.render("layout/main", { pages: "../master/agama/view", web, data }); // Mengirimkan halaman HTML dengan form tambah agama
 });
 
+// refresh tabel
+router.get("/data", async (req, res) => {
+  const data = await agamaList();
+  res.json(data)
+});
+
+
 // Menampilkan List Agama
 router.get("/:id/remove", async (req, res) => {
   const agamaId = req.params.id;
@@ -38,7 +45,8 @@ router.get("/:id/remove", async (req, res) => {
 router.post("/create", upload.none(), async (req, res) => {
   const namaAgama = req.body.nama_agama;
   const createBy = req.body.created_user;
-  const aktif = req.body.aktif;
+
+  const aktif = (req.body.aktif === 'on') ? true : false;
 
   try {
     await agamaCreate(namaAgama, createBy, aktif);
@@ -52,8 +60,8 @@ router.post("/create", upload.none(), async (req, res) => {
 // update data base
 router.post("/update", upload.none(), async (req, res) => {
   const namaAgama = req.body.editNamaAgama;
-  const updateBy = req.body.editUpdatedBy;
-  const aktif = req.body.editAktif;
+  const updateBy = req.body.editUpdatedUser;
+  const aktif =  (req.body.editAktif === 'on') ? true : false;
   const revisi = req.body.editRevisi;
   const idagama = req.body.editIdAgama;
 
@@ -64,22 +72,6 @@ router.post("/update", upload.none(), async (req, res) => {
     res.sendStatus(500); // Mengirim respons dengan kode status 500 jika terjadi kesalahan
   }
 });
-
-/* // GET route untuk menampilkan halaman edit agama berdasarkan ID
-router.get("/:id/edit", (req, res) => {
-  const agamaId = req.params.id;
-  // Ambil data agama dari database berdasarkan ID
-
-  res.render("layout/main", { pages: "../master/agama/edit", web }); // Mengirimkan halaman HTML dengan form tambah agama
-});
-
-// POST route untuk menambahkan data agama
-router.post("/", (req, res) => {
-  const { namaAgama } = req.body;
-  // Lakukan validasi data dan simpan ke database
-
-  res.redirect("/master/agama/"); // Redirect ke halaman daftar agama setelah berhasil menambahkan
-}); */
 
 // PUT route untuk memperbarui data agama berdasarkan ID
 router.put("/:id", (req, res) => {
