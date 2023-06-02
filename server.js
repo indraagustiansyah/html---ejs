@@ -26,8 +26,14 @@ app.use(express.static('public'));
 
 // Import router agama
 const agamaRouter = require('./routes/master/agama');
+const bahasaRouter = require('./routes/master/bahasa');
+const hariRouter = require('./routes/master/hari');
+const jenisPembayaranRouter = require('./routes/master/jenis_pembayaran');
 // Gunakan router agama
 app.use('/master/agama', agamaRouter);
+app.use('/master/bahasa', bahasaRouter);
+app.use('/master/hari',hariRouter );
+app.use('/master/jenis_pembayaran',jenisPembayaranRouter );
 
 
 // Define your routes
